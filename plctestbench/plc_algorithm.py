@@ -18,10 +18,11 @@ class PLCAlgorithm(Worker):
         super().__init__(settings)
         self.packet_size = self.settings.get("packet_size")
         self.crossfade_settings = self.settings.get("crossfade")
-        if isinstance(self.crossfade_settings, list):
+        if len(self.crossfade_settings) > 1:
             self.crossfade_class = MultibandCrossfade
         else:
             self.crossfade_class = Crossfade
+            self.crossfade_settings = self.crossfade_settings[0]
         self.crossfade = self.crossfade_class(self.settings, self.crossfade_settings)
         fade_in_settings = self.settings.get("fade_in")[0]
         if fade_in_settings.get("length") > self.packet_size:
@@ -86,6 +87,7 @@ class PLCAlgorithm(Worker):
         else:
             output_buffer = self._predict(output_buffer)
             output_buffer = self._fade_in(output_buffer)
+            self.crossfade.start()
         output_buffer = self._a_posteriori(output_buffer, is_valid)
         return output_buffer
 
@@ -107,6 +109,7 @@ class PLCAlgorithm(Worker):
         '''
         This function is called for every buffer.
         '''
+        self.fade_in.start()
         output_buffer = self.fade_in(self.context[-self.packet_size:], buffer)
         return output_buffer
     

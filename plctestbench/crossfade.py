@@ -28,7 +28,7 @@ class Crossfade(object):
 
         self.type = self.crossfade_settings.get("type")
         if self.type == CrossfadeType.power:
-            self.crossfade_buffer_b = (1 - self.crossfade_buffer_a ** 2) ** 1/2
+            self.crossfade_buffer_b = (1 - self.crossfade_buffer_a ** 2) ** (1/2)
         elif self.type == CrossfadeType.amplitude:
             self.crossfade_buffer_b = 1 - self.crossfade_buffer_a
 
@@ -38,13 +38,12 @@ class Crossfade(object):
         # One-pad the crossfade_buffer_a to match the length of the buffer in case it is shorter
         if self._ongoing:
             if np.shape(self.crossfade_buffer_a)[0] - self.idx < np.shape(prediction)[0]:
-                self.crossfade_buffer_a = np.pad(self.crossfade_buffer_a, (1, len(prediction) - (len(self.crossfade_buffer_a) - self.idx)), 'constant')
-                self.crossfade_buffer_b = np.pad(self.crossfade_buffer_b, (0, len(prediction) - (len(self.crossfade_buffer_b) - self.idx)), 'constant')
+                self.crossfade_buffer_a = np.pad(self.crossfade_buffer_a, (0, len(prediction) - (len(self.crossfade_buffer_a) - self.idx)), 'constant', constant_values=(1))
+                self.crossfade_buffer_b = np.pad(self.crossfade_buffer_b, (0, len(prediction) - (len(self.crossfade_buffer_b) - self.idx)), 'constant', constant_values=(0))
             if buffer is None:
                 buffer = np.zeros_like(prediction)
-            for idx in range(len(prediction)):
-                output_buffer = prediction[idx] * self.crossfade_buffer_b[self.idx] + buffer[idx] * self.crossfade_buffer_a[self.idx]
-                self.idx += 1
+            output_buffer = prediction * self.crossfade_buffer_b[self.idx:self.idx + len(prediction), np.newaxis] + buffer * self.crossfade_buffer_a[self.idx:self.idx + len(prediction), np.newaxis]
+            self.idx += len(prediction)
         else:
             output_buffer = buffer
         return output_buffer
@@ -54,7 +53,7 @@ class Crossfade(object):
         self.idx = 0
 
     def ongoing(self) -> bool:
-        if self.idx >= len(self.crossfade_buffer_a):
+        if self.idx >= self.crossfade_settings.length_in_samples:
             self._ongoing = False
         return self._ongoing
 
