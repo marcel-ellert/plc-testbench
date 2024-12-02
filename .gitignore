@@ -12,3 +12,4 @@ dist/
 venv/
 plctestbench-*
 listening_tests/
+metrics_comparison_tool/
