@@ -840,6 +840,14 @@ class PEAQCalculatorSettings(Settings):
         super().__init__()
         self.settings["peaq_mode"] = peaq_mode
 
+class WindowedPEAQCalculatorSettings(Settings):
+
+    def __init__(self, peaq_mode: PEAQMode = PEAQMode.basic,
+                       intorno_length: int = 300):
+        super().__init__()
+        self.settings["peaq_mode"] = peaq_mode
+        self.settings["intorno_length"] = intorno_length
+
 class PerceptualCalculatorSettings(Settings):
 
     def __init__(self, intorno_length: int = 300,
