@@ -415,7 +415,6 @@ class LinearCrossfadeSettings(CrossfadeSettings):
                 length:     length of the crossfade.
         '''
         super().__init__(length=length, function=CrossfadeFunction.power, exponent=1.0, type=type)
-        print(f"type: {type}")
 
 class QuadraticCrossfadeSettings(CrossfadeSettings):
     
@@ -671,7 +670,7 @@ class AdvancedPLCSettings(PLCSettings):
         This class containes the settings for the AdvancedPLC class.
 
             Input:
-                settings:              list of settings for each frequency band.
+                settings:                   list of settings for each frequency band.
                 frequencies:                list of frequencies used for the crossover (Full band or L/Mid).
                 order:                      order of the crossover.
                 stereo_image_processing:    type of stereo image processing.
