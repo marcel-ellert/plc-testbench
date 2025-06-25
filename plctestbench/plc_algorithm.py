@@ -324,7 +324,7 @@ class DeepLearningPLC(PLCAlgorithm):
     
     def __init__(self, settings: Settings) -> None:
         super().__init__(settings)
-        self.model = tf.keras.models.load_model(settings.get("model_path"), compile=False)
+        self.model = tf.keras.models.load_model(str(settings.get("model_path")), compile=False)
         self.fs_dl = settings.get("fs_dl")
         self.context_length = settings.get("context_length")
         self.context_length_samples = settings.get("context_length_samples")
