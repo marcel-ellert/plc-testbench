@@ -415,6 +415,7 @@ class LinearCrossfadeSettings(CrossfadeSettings):
                 length:     length of the crossfade.
         '''
         super().__init__(length=length, function=CrossfadeFunction.power, exponent=1.0, type=type)
+        print(f"type: {type}")
 
 class QuadraticCrossfadeSettings(CrossfadeSettings):
     
@@ -637,7 +638,7 @@ class DeepLearningPLCSettings(PLCSettings):
                 num_mel_bins:       number of mel bins of the tracks.
         '''
         super().__init__(crossfade, fade_in, crossfade_frequencies, crossover_order)
-        self.settings["model_path"] = relative_to_root(model_path)
+        self.settings["model_path"] = str(relative_to_root(model_path))
         self.settings["fs_dl"] = fs_dl
         self.settings["context_length"] = context_length
         self.settings["context_length_samples"] = context_length / 1000.0 * self.settings["fs_dl"]
@@ -670,9 +671,8 @@ class AdvancedPLCSettings(PLCSettings):
         This class containes the settings for the AdvancedPLC class.
 
             Input:
-                band_settings:              list of settings for each frequency band.
+                settings:              list of settings for each frequency band.
                 frequencies:                list of frequencies used for the crossover (Full band or L/Mid).
-                frequencies_b:              list of frequencies used for the crossover (R/Side if unlinked).
                 order:                      order of the crossover.
                 stereo_image_processing:    type of stereo image processing.
                 channel_link:               flag for channel link.
@@ -762,14 +762,13 @@ class AdvancedPLCSettings(PLCSettings):
             cloned_settings.settings["settings"] = channel_settings
         
         return self.__change_setting__("channel_link", channel_link, change_callback)
-
-
+        
 class MSECalculatorSettings(Settings):
 
     def __init__(self,
                  N: int = 1024,
                  hop = None,
-                 amp_scale: float = 1.0,):
+                 amp_scale: float = 1.0):
         '''
         This class containes the settings for the MSECalculator class.
 
@@ -789,7 +788,7 @@ class MAECalculatorSettings(Settings):
     def __init__(self,
                  N: int = 1024,
                  hop = None,
-                 amp_scale: float = 1.0,):
+                 amp_scale: float = 1.0):
         '''
         This class containes the settings for the MAECalculator class.
 
@@ -809,7 +808,7 @@ class SpectralEnergyCalculatorSettings(Settings):
     def __init__(self,
                  N: int = 1024,
                  hop = None,
-                 amp_scale: float = 1.0,):
+                 amp_scale: float = 1.0):
         '''
         This class containes the settings for the SpectralEnergyCalculatorSettings class.
 
