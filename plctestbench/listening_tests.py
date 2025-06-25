@@ -7,6 +7,7 @@ from ruamel.yaml import YAML
 import json
 import pandas as pd
 import copy
+from io import StringIO
 
 class ListeningTest(object):
 
@@ -230,7 +231,7 @@ class ListeningTest(object):
     for data in page_data:
       indexes, stimuli = data
       page = {
-        "type": "splat",
+        "type": "mushra",
         "id": '-'.join([str(index) for index in indexes]),
         "name": "Test in progress",
         "content": page_content,
@@ -334,12 +335,15 @@ class ListeningTest(object):
     if config_file_path.exists():
       with open(config_file_path, 'r') as file:
         existing_config = yaml.load(file)
-      if existing_config != config:
+        if existing_config != config:
           raise ValueError(f"A config file with the same name and different content exists: {config_file_path}. Resolve manually.")
+
     else:
       with open(config_file_path, 'w') as file:
-        config_stirng = yaml.dump_to_string(config).replace('- -', '-\n  -')
-        file.write(config_stirng)
+        stream = StringIO()
+        yaml.dump(config, stream)
+        config_string = stream.getvalue().replace('- -', '-\n  -')
+        file.write(config_string)
 
   def get_results(self) -> list:
 
