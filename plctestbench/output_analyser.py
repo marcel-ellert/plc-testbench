@@ -8,6 +8,7 @@ from .utils import dummy_progress_bar, extract_intorni, force_single_loss_per_st
 from .perceptual_metric import *
 from .listening_tests import ListeningTest
 import soundfile as sf
+import sys
 
 def normalise(x, amp_scale=1.0):
     return(amp_scale * x / np.amax(np.abs(x)))
@@ -127,8 +128,10 @@ class SpectralEnergyCalculator(OutputAnalyser):
 
         num_samples = len(x_r)
 
-        x_rk, x_ek = [(np.fft.fft(w*x_r[i:i+N]), np.fft.fft(w*x_e[i:i+N])) for i in
-                        self.progress_monitor(range(0, num_samples-N, hop), desc=str(self))]
+        fft_results = [(np.fft.fft(w*x_r[i:i+N]), np.fft.fft(w*x_e[i:i+N])) for i in
+               self.progress_monitor(range(0, num_samples-N, hop), desc=str(self))]
+
+        x_rk, x_ek = map(list, zip(*fft_results))
         x_2rk = np.abs(np.array(x_rk))**2
         x_2ek = np.abs(np.array(x_ek))**2
 
@@ -153,12 +156,19 @@ class PEAQCalculator(OutputAnalyser):
         new_path = path[:-4] + "_norm" + path[-4:]
         new_data = normalise(original_track_node.get_data())
         original_track_norm_file = AudioFile.from_audio_file(original_track_node, new_data=new_data, new_path=new_path)
+        original_track_norm_file.save()
         path = reconstructed_track_node.get_path()
         new_path = path[:-4] + "_norm" + path[-4:]
         new_data = normalise(reconstructed_track_node.get_data())
         reconstructed_track_norm_file = AudioFile.from_audio_file(reconstructed_track_node, new_data=new_data, new_path=new_path)
-        completed_process = subprocess.run(["peaq", mode_flag, "--gst-plugin-path", "/usr/lib/gstreamer-1.0/",
-                                           original_track_norm_file.get_path(), reconstructed_track_norm_file.get_path()], capture_output=True, text=True, check=False)
+        reconstructed_track_norm_file.save()
+
+        if mode_flag == '':
+            completed_process = subprocess.run(["peaq", "--gst-plugin-path", "/usr/lib/gstreamer-1.0/", original_track_norm_file.get_path(),
+                                                reconstructed_track_norm_file.get_path()], capture_output=True, text=True, check=False)
+        else:
+            completed_process = subprocess.run(["peaq", mode_flag, "--gst-plugin-path", "/usr/lib/gstreamer-1.0/", original_track_norm_file.get_path(),
+                                                reconstructed_track_norm_file.get_path()], capture_output=True, text=True, check=False)
 
         original_track_norm_file.delete()
         reconstructed_track_norm_file.delete()
@@ -176,9 +186,9 @@ class PEAQCalculator(OutputAnalyser):
             peaq_odg = float(peaq_odg)
             peaq_di = float(peaq_di)
             return PEAQData(peaq_odg, peaq_di)
-
-        print("The peaq program exited with the following errors:")
-        print(completed_process.stdout)
+        else:
+            print("The peaq program exited with the following errors:")
+            print(completed_process.stdout)
 
 class WindowedPEAQCalculator(OutputAnalyser):
     '''
@@ -204,10 +214,12 @@ class WindowedPEAQCalculator(OutputAnalyser):
         new_path = path[:-4] + "_norm" + path[-4:]
         new_data = normalise(original_track_node.get_data())
         original_track_norm_file = AudioFile.from_audio_file(original_track_node, new_data=new_data, new_path=new_path)
+        original_track_norm_file.save()
         path = reconstructed_track_node.get_path()
         new_path = path[:-4] + "_norm" + path[-4:]
         new_data = normalise(reconstructed_track_node.get_data())
         reconstructed_track_norm_file = AudioFile.from_audio_file(reconstructed_track_node, new_data=new_data, new_path=new_path)
+        reconstructed_track_norm_file.save()
 
         lost_samples_idxs = lost_samples_idxs_data.get_data()
         intorni_original = extract_intorni(original_track_norm_file, lost_samples_idxs, self.intorno_length, self.fs, self.packet_size)
@@ -217,12 +229,24 @@ class WindowedPEAQCalculator(OutputAnalyser):
         original_path = path[:-4] + "_chunk" + path[-4:]
         path = reconstructed_track_node.get_path()
         reconstructed_path = path[:-4] + "_chunk" + path[-4:]
-        metric = np.zeros(len(original_track_node.get_data())//self.packet_size)
-        for idx, intorno_original, intorno_reconstructed in self.progress_monitor(zip(intorni_original[0], intorni_original[1], intorni_reconstructed[1]), total=len(intorni_original[1]), desc=str(self)):
+        metric = np.zeros(len(original_track_node.get_data()) // self.packet_size)
+
+        for idx, (intorno_original, intorno_reconstructed) in enumerate(zip(intorni_original[1], intorni_reconstructed[1])):
+            # Prüfe Chunk-Länge
+            if len(intorno_original) < int(self.fs * 0.4):
+                print(f"Chunk {idx} zu kurz für PEAQ, wird übersprungen.")
+                metric[idx] = np.nan
+                continue
+
             original_intorno_file = AudioFile.from_audio_file(original_track_norm_file, new_data=intorno_original, new_path=original_path)
             reconstructed_intorno_file = AudioFile.from_audio_file(reconstructed_track_norm_file, new_data=intorno_reconstructed, new_path=reconstructed_path)
-            completed_process = subprocess.run(["peaq", self.mode_flag, "--gst-plugin-path", "/usr/lib/gstreamer-1.0/",
-                                            original_intorno_file.get_path(), reconstructed_intorno_file.get_path()], capture_output=True, text=True, check=False)
+            original_intorno_file.save()
+            reconstructed_intorno_file.save()
+
+            completed_process = subprocess.run(
+                ["peaq", self.mode_flag, "--gst-plugin-path", "/usr/lib/gstreamer-1.0/",
+                original_intorno_file.get_path(), reconstructed_intorno_file.get_path()],
+                capture_output=True, text=True, check=False)
 
             original_intorno_file.delete()
             reconstructed_intorno_file.delete()
@@ -232,14 +256,19 @@ class WindowedPEAQCalculator(OutputAnalyser):
             peaq_odg_text = "Objective Difference Grade: "
             peaq_di_text = "Distortion Index: "
             if (peaq_odg_text in peaq_output and peaq_di_text in peaq_output):
-                peaq_odg, peaq_di = peaq_output.split("\n", 1)
+                peaq_odg, _ = peaq_output.split("\n", 1)
                 _, peaq_odg = peaq_odg.split(peaq_odg_text)
-                _, peaq_di = peaq_di.split(peaq_di_text)
-                metric[idx] = self.sign*float(peaq_odg)
+                try:
+                    metric[idx] = self.sign * float(peaq_odg)
+                    print(f"metric[{idx}] set to {metric[idx]} (parsed ODG: {peaq_odg})")
+                except ValueError:
+                    print(f"PEAQ ODG konnte nicht geparst werden: {peaq_odg}")
+                    metric[idx] = np.nan
             else:
                 print("The peaq program exited with the following errors:")
                 print(completed_process.stdout)
-            
+                metric[idx] = np.nan
+
         original_track_norm_file.delete()
         reconstructed_track_norm_file.delete()
 
@@ -271,15 +300,19 @@ class PerceptualCalculator(OutputAnalyser):
         lost_samples_idxs = lost_samples_idxs_data.get_data()
         intorni_original = extract_intorni(original_track_node, lost_samples_idxs, self.intorno_length, self.fs, self.packet_size)
         intorni_reconstructed = extract_intorni(reconstructed_track_node, lost_samples_idxs, self.intorno_length, self.fs, self.packet_size)
-        # intorni_difference = [intorno_reconstructed - intorno_original for intorno_reconstructed, intorno_original in zip(intorni_reconstructed[1], intorni_original[1])]
         
+        if intorni_original[1][0].ndim == 1:
+            input_size = len(intorni_original[1][0])
+        else:
+            input_size = len(intorni_original[1][0][:, 0])
+
         pm = PerceptualMetric(self.transform_type,
                               self.min_frequency,
                               self.max_frequency,
                               self.bins_per_octave,
                               self.n_bins,
                               self.minimum_window,
-                              len(intorni_original[1][0][:, 0]),
+                              input_size,
                               self.fs,
                               self.intorno_length,
                               self.linear_mag,
@@ -288,24 +321,30 @@ class PerceptualCalculator(OutputAnalyser):
                               self.db_weighting,
                               self.metric)
 
-        spectrograms = [{'idx': idx, **pm.spectrogram(original[:, 0], reconstructed[:, 0])} for idx, original, reconstructed in self.progress_monitor(zip(intorni_original[0], intorni_original[1], intorni_reconstructed[1]), total=len(intorni_original[1]), desc=str(self))]
+        spectrograms = []
+        for idx, original, reconstructed in self.progress_monitor(zip(intorni_original[0], intorni_original[1], intorni_reconstructed[1]),
+                                                                  total=len(intorni_original[1]), desc=str(self)):
+            if intorni_original[1][0].ndim == 1:
+                spectrograms.append({'idx': idx, **pm.spectrogram(original[:], reconstructed[:])})
+            else:
+                for channel in range(original.shape[1]):
+                    spectrograms.append({'idx': (idx, channel), **pm.spectrogram(original[:, channel], reconstructed[:, channel])})
 
-        # to_file_idx = 47300
-        # # Save as an audio file the intorni_original[1] associated to intorni_original[0] == to_file_idx
-        # if any([idx == to_file_idx for idx in intorni_reconstructed[0]]):
-        #     idx = intorni_reconstructed[0].index(to_file_idx)
-        #     intorno = intorni_reconstructed[1][idx]
-        #     sf.write(f"intorno_original{intorni_reconstructed[0][idx]}.wav", intorno, self.fs)
-        
-        metric = np.zeros(len(original_track_node.get_data())//self.packet_size)
+        if intorni_original[1][0].ndim == 1:
+            metric = np.zeros(len(original_track_node.get_data()) // self.packet_size)
+        else:
+            metric = np.zeros((len(original_track_node.get_data()) // self.packet_size, 2))
 
         for spectrogram in spectrograms:
-            print(f'Perceptual metric-{spectrogram["idx"]}: ', end='')
             perc_metric = pm(spectrogram)
-            metric[spectrogram['idx']] = perc_metric
-        
-        return SimpleCalculatorData(metric)
+            if isinstance(spectrogram['idx'], tuple):
+                idx, channel = spectrogram['idx']
+                metric[idx, channel] = perc_metric
+            else:
+                metric[spectrogram['idx']] = perc_metric
 
+        return SimpleCalculatorData(metric)
+    
 class HumanCalculator(OutputAnalyser):
     '''
     ListeningTest is ...
@@ -348,7 +387,8 @@ class HumanCalculator(OutputAnalyser):
         intorni_reconstructed_loud = transpose(intorni_reconstructed_loud)
 
         if self.stimuli_number > len(intorni_original_loud[1]):
-            error_message = f"The number of stimuli requested ({self.stimuli_number}) is greater than the number of stimuli available ({len(intorni_original_loud)}). Increase the total length of available audio."
+            error_message = (f"The number of stimuli requested ({self.stimuli_number}) is greater than the number of stimuli available "
+                             f"({len(intorni_original_loud)}). Increase the total length of available audio.")
             discarded_packets_close = (len(lost_samples_idxs_data.get_data()) - len(lost_samples_idxs)) // self.packet_size
             if discarded_packets_close > 0:
                 error_message += f" {discarded_packets_close} stimulus were discarded because too close to each other."
@@ -370,7 +410,20 @@ class HumanCalculator(OutputAnalyser):
         results =  self.listening_test.get_results()
 
         metric = np.zeros(len(original_track_node.get_data())//self.packet_size)
+
+        string_to_int_map = {}
+        next_available_index = len(metric)  # Startindex für Strings (nach den numerischen Indizes)
+
         for idx, mean, _ in self.progress_monitor(results, desc=str(self)):
-            metric[int(idx.split('-')[-1])] = mean
-        
+            try:
+                index = int(idx.split('-')[-1])
+            except ValueError:
+                if idx not in string_to_int_map:
+                    string_to_int_map[idx] = next_available_index
+                    next_available_index += 1
+                index = string_to_int_map[idx]          
+            if index >= len(metric):
+                metric = np.pad(metric, (0, index - len(metric) + 1), 'constant', constant_values=0)
+            metric[index] = mean
+
         return SimpleCalculatorData(metric)
