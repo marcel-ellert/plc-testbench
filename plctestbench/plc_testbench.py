@@ -53,6 +53,7 @@ class PLCTestbench(object):
         Run the testbench.
         '''
         self.data_manager.run_testbench()
+        print("testbench.run finished!")
 
     def plot(self, plot_settings={}, show=True, to_file=False, original_tracks=False, lost_samples_masks=False, reconstructed_tracks=False, output_analyses=False, group=False, peaq_summary=False) -> None:
         '''
@@ -99,4 +100,5 @@ class PLCTestbench(object):
 
         if show:
             PlotManager.show()
+        print("testbench.plot finished!")
         
