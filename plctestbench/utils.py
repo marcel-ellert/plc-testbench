@@ -154,6 +154,8 @@ def fade_out(audio, fs, fade_out_time) -> None:
 
 def leading_silence(audio, fs, silence_time) -> None:
     silence_samples = int(silence_time * fs / 1000)
+    if audio.ndim == 1:
+        audio = np.expand_dims(audio, axis=1)
     silence = np.zeros((silence_samples, audio.shape[1]), dtype=audio.dtype)
     return np.concatenate((silence, audio), axis=0)
 

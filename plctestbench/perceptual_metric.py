@@ -3,7 +3,7 @@ from .utils import relative_to_root
 
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator as RGI
-from essentia.standard import NSGConstantQ
+from essentia.standard import NSGConstantQ # type: ignore # 
 import librosa
 from matplotlib import pyplot as plt
 import plotly.graph_objects as go
@@ -15,9 +15,9 @@ import pstats
 import io
 
 def S1dataset_generateTFmaskfunc(center_f, f_axis, ERBspac=1, timespac=0.001, varargin=[8]):
-    
+
     def freq_to_erb(freq):
-        return 21.4 * np.log10(1 + freq / 229)
+        return 21.3323 * np.log10(1 + freq / 229)
 
     def erb_to_hz(erb):
         """
@@ -29,12 +29,12 @@ def S1dataset_generateTFmaskfunc(center_f, f_axis, ERBspac=1, timespac=0.001, va
         Returns:
         float: Output frequency in Hz.
         """
-        return (np.exp(erb / 9.26449) - 1) * 24.7 * 9.26449
+        return (10**(erb / 21.3323) - 1) / 0.00437
     
     data = np.load(relative_to_root('masking_data/S1dataset_rawdata.npz'))
-    dT = data['dT'].flatten()
-    dF = data['dF'].flatten()
-    AM = data['data']
+    dT = data['dT'].flatten() # time difference in seconds
+    dF = data['dF'].flatten() # frequency distance in ERB 
+    AM = data['data'] # amplitude in dB (SPL?)
 
     if varargin is None:
         ERBmin = np.min(dF)
@@ -57,6 +57,7 @@ def S1dataset_generateTFmaskfunc(center_f, f_axis, ERBspac=1, timespac=0.001, va
     dTi = np.arange(np.min(dT), np.max(dT) + timespac, timespac)
     
     freqs = f_axis[(f_axis >= np.min(dFi)) & (f_axis <= np.max(dFi))]
+    freqs = freqs[(freqs >= 20) & (freqs <= 20000)]
 
     r = RGI((dT, dF_hz), AM.T, method='linear', bounds_error=False, fill_value=0)
     dTi_grid, dFi_grid = np.meshgrid(dTi, freqs, indexing='ij')
@@ -262,8 +263,12 @@ class PerceptualMetric(object):
         self.input_size = input_size
         self.fs = fs
 
+        # Check for invalid combination of transform_type and masking
+        if transform_type == 'dcgc' and masking:
+            raise ValueError("Masking=True is not supported for transform_type='dcgc'.")
+
         if transform_type == 'cqt':
-            cqt = NSGConstantQ(minFrequency=min_frequency,
+            cqt = essentia.NSGConstantQ(minFrequency=min_frequency,
                                maxFrequency=max_frequency,
                                binsPerOctave=bins_per_octave,
                                minimumWindow=minimum_window,
@@ -304,24 +309,11 @@ class PerceptualMetric(object):
             spectrogram_difference_db = librosa.amplitude_to_db(spectrogram_difference_mag, ref=ref_value)
 
             freq_axis = librosa.cqt_frequencies(spectrogram_original_db.shape[0], fmin=self.min_frequency, bins_per_octave=self.bins_per_octave)
+            freq_axis = freq_axis[freq_axis <= self.max_frequency]
 
             if self.masking:
-                # Profile the function
-                # pr = cProfile.Profile()
-                # pr.enable()
 
                 mask = apply_masking_to_cqt(spectrogram_original_db, freq_axis, self.fs, self.intorno_length) + self.masking_offset
-
-                # pr.disable()
-                
-                # Collect profiling results
-                # s = io.StringIO()
-                # sortby = 'cumulative'
-                # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-                # ps.print_stats()
-
-                # Output profiling results
-                # print(s.getvalue())
 
                 spectrogram_difference_masked = np.where(spectrogram_difference_db < mask, 0, spectrogram_difference)
                 spectrogram_difference_masked_mag = np.abs(spectrogram_difference_masked)
@@ -350,27 +342,5 @@ class PerceptualMetric(object):
             spectrogram_reconstructed_masked_residual = np.where(spectrogram_reconstructed_masked_residual < 0, 0, spectrogram_reconstructed_masked_residual)
             perc_metric = np.sum(spectrogram_reconstructed_masked_residual) / 10000
 
-        print(f"{perc_metric}")
-
-        # time_axis = np.linspace(0, spectrogram_original_db.shape[1] / self.fs, num=spectrogram_original_db.shape[1])
-
-        # plot_idx = 18699
-        # if spectrogram['idx'] == plot_idx + 1:
-        #     # plt.figure(figsize=(12, 4))
-        #     # plt.imshow(cqt_original_db, aspect='auto', origin='lower', cmap='jet')
-        #     # plt.colorbar()
-        #     # plt.title('Original CQT')
-        #     # plt.savefig('original_cqt.png')
-        #     note_axis = [librosa.hz_to_note(f) for f in freq_axis]
-        #     fig = go.Figure()
-        #     fig.add_trace(go.Surface(x=time_axis, y=note_axis, z=spectrogram_difference_masked_db, colorscale='Inferno'))
-        #     fig.add_trace(go.Surface(x=time_axis, y=note_axis, z=spectrogram_original_db, colorscale='Viridis'))
-        #     fig.update_layout(scene = dict(
-        #                 xaxis_title='Time',
-        #                 yaxis_title='CQT bins',
-        #                 zaxis_title='Amplitude (dB)'),
-        #               title="Interactive 3D CQT Plot")
-        #     fig.show()
-
-        
+        print(f"Perceptual Metric: {perc_metric:}")
         return perc_metric

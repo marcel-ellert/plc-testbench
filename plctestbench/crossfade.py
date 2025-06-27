@@ -20,16 +20,19 @@ class Crossfade(object):
         self._ongoing = False
         self.idx = 0
         
+        self.crossfade_buffer_a = np.zeros(self.crossfade_settings.length_in_samples)
+        self.crossfade_buffer_b = np.zeros(self.crossfade_settings.length_in_samples)
+
         self.function = self.crossfade_settings.get("function")
-        if self.function == CrossfadeFunction.power:
+        if self.function == "power":
             self.crossfade_buffer_a = power_crossfade(self.crossfade_settings)
-        elif self.function == CrossfadeFunction.sinusoidal:
+        elif self.function == "sinusoidal":
             self.crossfade_buffer_a = sinusoidal_crossfade(self.crossfade_settings)
 
         self.type = self.crossfade_settings.get("type")
-        if self.type == CrossfadeType.power:
+        if self.type == "power":
             self.crossfade_buffer_b = (1 - self.crossfade_buffer_a ** 2) ** (1/2)
-        elif self.type == CrossfadeType.amplitude:
+        elif self.type == "amplitude":
             self.crossfade_buffer_b = 1 - self.crossfade_buffer_a
 
     def __call__(self, prediction: np.ndarray, buffer: np.ndarray = None) -> np.ndarray:
