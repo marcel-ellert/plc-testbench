@@ -16,7 +16,7 @@ plotly==6.0.1
 pybind11==2.10.4
 pymongo==4.3.3
 ruamel.yaml==0.18.10
-scipy==1.16.0
+scipy==1.15.2
 seaborn==0.13.2pip
 setuptools==65.5.0
 soundfile==0.13.1
