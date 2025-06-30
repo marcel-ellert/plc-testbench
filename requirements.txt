@@ -17,7 +17,7 @@ pybind11==2.10.4
 pymongo==4.3.3
 ruamel.yaml==0.18.10
 scipy==1.15.2
-seaborn==0.13.2pip
+seaborn==0.13.2
 setuptools==65.5.0
 soundfile==0.13.1
 statsmodels==0.14.4
