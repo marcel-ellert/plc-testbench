@@ -148,7 +148,7 @@ You will find both the audio files and the results in the folder specified in th
 
 Important Information: The DeepLearningPLC algorithm requires the `bufer_size` to be set to 128 in the `Settings` of the `PacketLossSimulator` of choice.
 
-### Crossfades
+### Crossfades (not updated yet)
 
 When a packet is lost, the PLC algorithm has to reconstruct the lost samples. However, the reconstructed samples are not going to be identical to the original ones. This is why we implemented a crossfade feature, which allows to gradually transition from the original samples to the reconstructed ones, and vice versa.
 
@@ -183,7 +183,7 @@ However, there are other convenience classes that are pre-set to some common con
 
 Both the `fade_in` and `crossfade` parameters always default to `NoCrossfadeSettings` so that the crossfade is disabled by default.
 
-### Multiband Crossfade
+### Multiband Crossfade (not updated yet)
 
 Different crossfade settings can be applied to different frequency bands. This can be useful mitigate some of the artifacts introduced by the crossfade.
 
@@ -203,7 +203,7 @@ The list beginning with the `MultibandSettings` class contains the crossfade set
 
 Each band can have its own crossfade settings, totally unrelated to the other bands.
 
-### Advanced PLC
+### Advanced PLC (not updated yet)
 
 The `AdvancedPLC` object allow for two complex beheviours simultaneously:
 - **Multiband PLC**: different PLC algorithms can be applied to different frequency bands. 
