@@ -124,6 +124,7 @@ Install webMUSHRA and pyMUSHRA.
 ```
 
 ## Usage
+You use the testbench with a Jupyter Notebook. How to use it is explained in the next steps.
 
 ### Startup and Initializing
 
@@ -131,7 +132,7 @@ If you have done the installation directly before, skip this point. Otherwise ac
 ```bash
     wsl -d ubuntu
     source venv310/bin/activate
-	podman start mongodb
+    podman start mongodb
 ```
 
 The file `plctestbench.ipynb` contains a Jupyter Notebook. Navigate to it and start the Juypter Notebook.
@@ -155,8 +156,9 @@ Put the audio files to be analyzed in this folder and list them as follows (path
     original_audio_tracks = [(OriginalAudio, OriginalAudioSettings('Blues_Drums.wav')),
                             (OriginalAudio, OriginalAudioSettings('Blues_Piano.wav'))]
 ```
-Afterwards you can start the testbench with your specific settings by commiting/uncomitting and changing the setup to your specific needs.
-You need to click on the Icon with two arrows pointing to the right ('restart the kernel and run all the cells').
+Afterwards you can set up the testbench settings by commenting in/out and/or changing the setup to your specific needs.
+The format is adapted in `plctestbench.ipynb` so that simple commenting out and commenting in is possible. Here, however, it is shortened for reasons of clarity.
+To start the testbench you need to click on the Icon with two arrows pointing to the right.
 You will find both the audio files and the results in the folder specified in `input_files`.
 
 Important Information: The DeepLearningPLC algorithm requires the `packet_size` to be set to 128 in the `Settings` of the `PacketLossSimulator` of choice.
@@ -165,39 +167,39 @@ See the example below.
     packet_loss_simulators = [(BinomialPLS, BinomialPLSSettings(packet_size = 128))]
 ```
 
-### Crossfades (not updated yet)
+### Fade in/Crossfade
 
-When a packet is lost, the PLC algorithm has to reconstruct the lost samples. However, the reconstructed samples are not going to be identical to the original ones. This is why we implemented a crossfade feature, which allows to gradually transition from the original samples to the reconstructed ones, and vice versa.
+When a packet is lost, the PLC algorithm has to reconstruct the lost samples. However, the reconstructed samples are not going to be identical to the original ones. A fade in/crossfade feature allows to gradually transition from the original samples to the reconstructed ones, and vice versa. This works by creating two vectors from 0 to 1 depending on the selected function. These are multiplied by the original and the reconstructed samples. Finally, the power or amplitude is adjusted.
 
 The crossfade can be customized in the following aspects:
-- **Length**: the duration of the crossfade in milliseconds.
-- **Function**: the function to use:
-    - **Power**: the crossfade is $x^n$.
-    - **Sinusoidal**: the crossfade is sinusoidal ($\sin\left(x\right)$ for $0 < x < \frac{\pi}{2}$).
-- **Exponent**: the exponent of the power crossfade function.
+- **Length**: duration of the crossfade in milliseconds.
+- **Function**: function to use:
+    - **Power**: crossfade is $x^n$.
+    - **Sinusoidal**: crossfade is sinusoidal ($\sin\left(x\right)$ for $0 < x < \frac{\pi}{2}$).
+- **Exponent**: exponent of the power crossfade function.
 - **Type**:
-    - **Equal Power**: the sum of the squares of the two crossfades is equal to 1.
-    - **Equal Amplitude**: the sum of the two crossfades is equal to 1.
+    - **Equal Power**: sum of the squares of the two crossfades equals 1.
+    - **Equal Amplitude**: sum of the two crossfades equals 1.
 
-The crossfade can be applied to the left or the right of the lost samples, or both. The following example illustrates how to configure the settings to use the crossfade:
+The fade in/crossfade can be applied to the left or the right of the lost samples, or both. The following example illustrates how to configure the settings to use these.
 ```python
-    crossfade_settings = ManualCrossfadeSettings(length=1,\
-                        function='power', exponent=2.0, type='power')
-
-    (ZerosPLC, ZerosPLCSettings(fade_in=QuadraticCrossfadeSettings(length=1),\
-        crossfade=crossfade_settings))
+    crossfade_settings = (ManualCrossfadeSettings(length = 1, function = 'power', exponent = 1.0, type = 'power'))
+    
+    plc_algorithms = [(ZerosPLC, ZerosPLCSettings(fade_in = crossfade_settings, crossfade = crossfade_settings))]
 ```
-As shown in the previous example, the `fade_in` parameter of any `PLCAlgorithm` determines the crossfade to apply to the left of the lost samples, while the `crossfade` parameter determines the crossfade to apply to the right of the lost samples. It is important to note that the length of the `fade_in` crossfade cannot be greater than the length of the lost packet.
+As shown in the previous example, the `fade_in` parameter determines the crossfade to apply to the left of the lost samples, while the `crossfade` parameter determines the crossfade to apply to the right of the lost samples.
+
+Important Information: The length of `fade_in` cannot be greater than the length of the lost packet.
 
 The `ManualCrossfadeSettings` class allows to manually set the parameters of the crossfade.
-However, there are other convenience classes that are pre-set to some common configurations:
+However, there are other convenience classes that are pre-set to some common configurations.
 - `NoCrossfadeSettings`: disables the crossfade.
 - `LinearCrossfadeSettings`: applies a linear crossfade (`function` = 'power' and `exponent` = 1.0).
 - `QuadraticCrossfadeSettings`: applies a quadratic crossfade (`function` = 'power' and `exponent` = 2.0).
 - `CubicCrossfadeSettings`: applies a cubic crossfade (`function` = 'power' and `exponent` = 3.0).
 - `SinusoidalCrossfadeSettings`: applies a sinusoidal crossfade (`function` = 'sinusoidal').
 
-
+You will find them in `plctestbench.ipynb`.
 Both the `fade_in` and `crossfade` parameters always default to `NoCrossfadeSettings` so that the crossfade is disabled by default.
 
 ### Multiband Crossfade (not updated yet)
