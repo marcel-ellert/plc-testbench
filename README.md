@@ -37,9 +37,7 @@ Install WSL (https://learn.microsoft.com/de-de/windows/wsl/install).
     wsl --install
     wsl.exe -d Ubuntu
 ```
-Choose your username and password and go to the path where you want to save your files.
-
-Create an isolated environment with Python 3.10 and activate it.
+Choose your username and password and go to the path where you want to save your files. Create an isolated environment with Python 3.10 and activate it.
 ```bash
     sudo apt install python3.10 python3.10-venv python3.10-dev
     python3.10 -m venv venv310
@@ -53,11 +51,11 @@ Update package sources, install additional tools, add external Python package so
     sudo apt install software-properties-common
     sudo apt install jupyter-core
     sudo apt install libsndfile1
-	sudo apt install pipx
+    sudo apt install pipx
     sudo apt install python3-pip
-	sudo snap install astral-uv --classic
-	sudo add-apt-repository ppa:deadsnakes/ppa
-	sudo apt update
+    sudo snap install astral-uv --classic
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update
 ```
 
 Install podman and pull the image
@@ -129,9 +127,7 @@ The file `plctestbench.ipynb` contains a Jupyter Notebook. Start the Juypter Not
 ```bash
     jupyter notebook
 ```
-Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'.
-This file contains examples and explanations of how to use the tool.
-
+Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'. This file contains examples and explanations of how to use the tool.
 Change the path to your root folder.
 ```python/jupyter notebook
 testbench_settings = {
