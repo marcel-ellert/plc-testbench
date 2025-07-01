@@ -35,23 +35,23 @@ It is recomended however to use the [Docker image](https://hub.docker.com/_/mong
 Install WSL (https://learn.microsoft.com/de-de/windows/wsl/install).
 ```bash
     wsl --install
-	wsl.exe -d Ubuntu
+    wsl.exe -d Ubuntu
 ```
 Choose your username and password and go to the path where you want to save your files.
 
 Create an isolated environment with Python 3.10 and activate it.
 ```bash
     sudo apt install python3.10 python3.10-venv python3.10-dev
-	python3.10 -m venv venv310
-	source venv310/bin/activate
+    python3.10 -m venv venv310
+    source venv310/bin/activate
 ```
 
 Update package sources, install additional tools, add external Python package source and update again.
 ```bash
     sudo apt update
-    sudo apt install podman 
-	sudo apt install software-properties-common
-  	sudo apt install jupyter-core
+    sudo apt install podman
+    sudo apt install software-properties-common
+    sudo apt install jupyter-core
     sudo apt install libsndfile1
 	sudo apt install pipx
     sudo apt install python3-pip
@@ -134,12 +134,12 @@ This file contains examples and explanations of how to use the tool.
 
 Change the path to your root folder.
 ```python/jupyter notebook
-    testbench_settings = {
-        'root_folder': 'path/to/root/folder',
-        'db_ip': 'ip.of.the.database',
-        'db_port': 27017,
-        'db_username': 'myUserAdmin',
-        'db_password': 'admin',
+testbench_settings = {
+    'root_folder': 'path/to/root/folder',
+    'db_ip': 'ip.of.the.database',
+    'db_port': 27017,
+    'db_username': 'myUserAdmin',
+    'db_password': 'admin',
 }
 ```
 Put the audio files to be analyzed in this folder and list them as follows (path relative to `root_folder`):
