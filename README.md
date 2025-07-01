@@ -173,7 +173,7 @@ When a packet is lost, the PLC algorithm has to reconstruct the lost samples. Ho
 
 The crossfade can be customized in the following aspects:
 - **Length**: duration of the crossfade in milliseconds.
-- **Function**: function to use:
+- **Function**:
     - **Power**: crossfade is $x^n$.
     - **Sinusoidal**: crossfade is sinusoidal ($\sin\left(x\right)$ for $0 < x < \frac{\pi}{2}$).
 - **Exponent**: exponent of the power crossfade function.
@@ -182,7 +182,7 @@ The crossfade can be customized in the following aspects:
     - **Equal Amplitude**: sum of the two crossfades equals 1.
 
 The fade in/crossfade can be applied to the left or the right of the lost samples, or both. The following example illustrates how to configure the settings to use these.
-```python
+```python/jupyter notebook
     crossfade_settings = (ManualCrossfadeSettings(length = 1, function = 'power', exponent = 1.0, type = 'power'))
     
     plc_algorithms = [(ZerosPLC, ZerosPLCSettings(fade_in = crossfade_settings, crossfade = crossfade_settings))]
@@ -202,25 +202,29 @@ However, there are other convenience classes that are pre-set to some common con
 You will find them in `plctestbench.ipynb`.
 Both the `fade_in` and `crossfade` parameters always default to `NoCrossfadeSettings` so that the crossfade is disabled by default.
 
-### Multiband Crossfade (not updated yet)
+### Multiband Fade in/Crossfade
 
 Different crossfade settings can be applied to different frequency bands. This can be useful mitigate some of the artifacts introduced by the crossfade.
 
-This is an example configuration for three bands crossfade:
-```python
-    multiband_crossfade_settings = \
-        [MultibandSettings(frequencies = [200, 2000]),
-         QuadraticCrossfadeSettings(length=50),
-         QuadraticCrossfadeSettings(length=5),
-         QuadraticCrossfadeSettings(length=1)]
+This is an example configuration for three bands crossfade only.
+```python/jupyter notebook
+    multiband_crossfade_settings = [
+        QuadraticCrossfadeSettings(length=50),
+        QuadraticCrossfadeSettings(length=5),
+        QuadraticCrossfadeSettings(length=1)
+    ]
 
-    (ZerosPLC, ZerosPLCSettings(crossfade=multiband_crossfade_settings))
+    plc_algorithms = [(LastPacketPLC, LastPacketPLCSettings(
+         crossfade = multiband_crossfade_settings,
+         fade_in = None,
+         crossfade_frequencies = [200, 2000],
+         crossover_order = 4,
+         mirror_x = False,
+         mirror_y = False,
+         clip_strategy = ClipStrategy.subtract))
+    ]
 ```
-The `MultibandSettings` class allows to specify the frequencies of the bands. The first frequency is the upper bound of the first band, while the last frequency is the lower bound of the last band. The number of frequencies determines the number of bands.
-
-The list beginning with the `MultibandSettings` class contains the crossfade settings for each band. The first element of the list is the crossfade settings for the first band, the second element is the crossfade settings for the second band, and so on. The length of the list must be equal to the number of bands.
-
-Each band can have its own crossfade settings, totally unrelated to the other bands.
+The `crossfade_frequencies` class allows to specify the frequencies of the bands. The first frequency is the upper bound of the first band, while the last frequency is the lower bound of the last band. The number of frequencies determines the number of bands. The list beginning with the `multiband_crossfade_settings` class contains the crossfade settings for each band. The first element of the list is the crossfade settings for the first band, the second element is the crossfade settings for the second band, and so on. The length of the list must be equal to the number of bands. Each band can have its own crossfade settings, totally unrelated to the other bands.
 
 ### Advanced PLC (not updated yet)
 
