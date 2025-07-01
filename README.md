@@ -71,12 +71,16 @@ Then run the container setting the port to 27017 and the name to mongodb. Also s
 ```
 
 Clone this repository, install the requirements and the plctestbench package.
-
 ```bash
     git clone https://github.com/marcel-ellert/plc-testbench
     cd plc-testbench
     pip install -r requirements.txt
     cd ..
+```
+
+Create a folder for your input files named 'input_files'.
+```bash   
+    mkdir input_files
 ```
 
 Clone and install the [burg-python-bindings](https://github.com/LucaVignati/burg-python-bindings).
@@ -123,12 +127,20 @@ Install webMUSHRA and pyMUSHRA.
 
 ### Startup and Initializing
 
-The file `plctestbench.ipynb` contains a Jupyter Notebook. Start the Juypter Notebook.
+If you have done the installation directly before, skip this point. Otherwise activate ubuntu, the virtual environment venv310 and mongodb.
+```bash
+    wsl -d ubuntu
+    source venv310/bin/activate
+	podman start mongodb
+```
+
+The file `plctestbench.ipynb` contains a Jupyter Notebook. Navigate to it and start the Juypter Notebook.
 ```bash
     jupyter notebook
 ```
+
 Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'. This file contains examples and explanations of how to use the tool.
-Change the path to your root folder.
+Change the path to your root folder named 'input_files'.
 ```python/jupyter notebook
     testbench_settings = {
         'root_folder': 'path/to/root/folder',
@@ -143,10 +155,15 @@ Put the audio files to be analyzed in this folder and list them as follows (path
     original_audio_tracks = [(OriginalAudio, OriginalAudioSettings('Blues_Drums.wav')),
                             (OriginalAudio, OriginalAudioSettings('Blues_Piano.wav'))]
 ```
-Afterwards you can start the Testbench with your specific settings by commiting/uncomitting and changing the setup to your specific needs.
-You will find both the audio files and the results in the folder specified in the `root_folder` setting.
+Afterwards you can start the testbench with your specific settings by commiting/uncomitting and changing the setup to your specific needs.
+You need to click on the Icon with two arrows pointing to the right ('restart the kernel and run all the cells').
+You will find both the audio files and the results in the folder specified in `input_files`.
 
-Important Information: The DeepLearningPLC algorithm requires the `bufer_size` to be set to 128 in the `Settings` of the `PacketLossSimulator` of choice.
+Important Information: The DeepLearningPLC algorithm requires the `packet_size` to be set to 128 in the `Settings` of the `PacketLossSimulator` of choice.
+See the example below.
+```python/jupyter notebook
+    packet_loss_simulators = [(BinomialPLS, BinomialPLSSettings(packet_size = 128))]
+```
 
 ### Crossfades (not updated yet)
 
