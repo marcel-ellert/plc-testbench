@@ -58,7 +58,7 @@ Update package sources, install additional tools, add external Python package so
     sudo apt update
 ```
 
-Install podman and pull the image
+Install podman and pull the image.
 ```bash
     podman pull docker.io/library/mongo:6.0.8
 ```
