@@ -78,7 +78,7 @@ Clone this repository, install the requirements and the plctestbench package.
     cd ..
 ```
 
-Create a folder for your input files named 'input_files'.
+Create a folder for your input files named `input_files`.
 ```bash   
     mkdir input_files
 ```
@@ -139,8 +139,8 @@ The file `plctestbench.ipynb` contains a Jupyter Notebook. Navigate to it and st
     jupyter notebook
 ```
 
-Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'. This file contains examples and explanations of how to use the tool.
-Change the path to your root folder named 'input_files'.
+Copy and paste one of the URLs to a browser. Click on `plctestbench.ipynb`. This file contains examples and explanations of how to use the tool.
+Change the path to your root folder named `input_files`.
 ```python/jupyter notebook
     testbench_settings = {
         'root_folder': 'path/to/root/folder',
