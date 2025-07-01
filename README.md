@@ -131,17 +131,17 @@ Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'. This
 Change the path to your root folder.
 ```python/jupyter notebook
     testbench_settings = {
-    'root_folder': 'path/to/root/folder',
-    'db_ip': 'ip.of.the.database',
-    'db_port': 27017,
-    'db_username': 'myUserAdmin',
-    'db_password': 'admin',
+        'root_folder': 'path/to/root/folder',
+        'db_ip': 'ip.of.the.database',
+        'db_port': 27017,
+        'db_username': 'myUserAdmin',
+        'db_password': 'admin',
     }
 ```
 Put the audio files to be analyzed in this folder and list them as follows (path relative to `root_folder`):
 ```python/jupyter notebook
-original_audio_tracks = [(OriginalAudio, OriginalAudioSettings('Blues_Drums.wav')),
-                         (OriginalAudio, OriginalAudioSettings('Blues_Piano.wav'))]
+    original_audio_tracks = [(OriginalAudio, OriginalAudioSettings('Blues_Drums.wav')),
+                            (OriginalAudio, OriginalAudioSettings('Blues_Piano.wav'))]
 ```
 Afterwards you can start the Testbench with your specific settings by commiting/uncomitting and changing the setup to your specific needs.
 You will find both the audio files and the results in the folder specified in the `root_folder` setting.
