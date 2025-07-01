@@ -130,13 +130,13 @@ The file `plctestbench.ipynb` contains a Jupyter Notebook. Start the Juypter Not
 Copy and paste one of the URLs to a browser. Click on 'plctestbench.ipynb'. This file contains examples and explanations of how to use the tool.
 Change the path to your root folder.
 ```python/jupyter notebook
-testbench_settings = {
+    testbench_settings = {
     'root_folder': 'path/to/root/folder',
     'db_ip': 'ip.of.the.database',
     'db_port': 27017,
     'db_username': 'myUserAdmin',
     'db_password': 'admin',
-}
+    }
 ```
 Put the audio files to be analyzed in this folder and list them as follows (path relative to `root_folder`):
 ```python/jupyter notebook
