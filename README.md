@@ -2,7 +2,9 @@
 
 PLCTestbench is a companion tool for researchers and developers working on Packet Loss Concealment (PLC). It greatly simplifies the process of measuring the reconstruction quality of PLC algorithms and allows to easily test the effects of different packet loss models and distributions.
 
-It features the implementation of some of the most common packet loss models, PLC algorithms and metrics:
+It features the implementation of some of the most common packet loss models, PLC algorithms and metrics.
+
+Important Information: Currently The setup.py is not working. Furthermore, the metrics **Windowed PEAQ** and **Spectral Energy Difference**, as well as the plot method `plot_peaq_summary` do not work. In addition, incorrect results were obtained for the **PEAQ** metric in the advanced mode during tests.
 
 **Packet Loss Simulation**
 - **Binomial**: uniform distribution of packet losses, governed by the Packet Error Ratio (PER) parameter.
@@ -22,8 +24,8 @@ It features the implementation of some of the most common packet loss models, PL
 - **Mean Square Error**: the mean square error between the original and reconstructed signal.
 - **Mean Amplitude Error**: the mean amplitude error between the original and reconstructed signal.
 - **PEAQ**: the Perceptual Evaluation of Audio Quality (PEAQ) metric, as defined in [[4](#4)].
-- **Windowed PEAQ**: PEAQ with a specific window length.
-- **Spectral Energy Difference**: Difference of spectral energy between the original and reconstructed signal. (Currenty not usable)
+- **Windowed PEAQ**: PEAQ with a specific window length. (Currenty not usable)
+- **Spectral Energy Difference**: Difference magnitude of DFT energies between the original and reconstructed signal. (Currenty not usable) 
 - **Human**: this metric produces the config file for a MUSHRA test using as stimuli excerpts of the reconstructed audio tracks. It also gathers the results of the test to be displayed alongside the other metrics.
 - **Perceptual**: perceptually-motivated evaluation metric for Packet Loss Concealment in Networked Music Performances, as defined in [[5](#5)]
 
@@ -206,7 +208,7 @@ Both the `fade_in` and `crossfade` parameters always default to `NoCrossfadeSett
 
 Different crossfade settings can be applied to different frequency bands. This can be useful mitigate some of the artifacts introduced by the crossfade.
 
-This is an example configuration for three bands crossfade only.
+This is an example configuration for a quadratic crossfade of three bands without fade-in.
 ```python/jupyter notebook
     multiband_crossfade_settings = [
         QuadraticCrossfadeSettings(length=50),
@@ -218,13 +220,10 @@ This is an example configuration for three bands crossfade only.
          crossfade = multiband_crossfade_settings,
          fade_in = None,
          crossfade_frequencies = [200, 2000],
-         crossover_order = 4,
-         mirror_x = False,
-         mirror_y = False,
-         clip_strategy = ClipStrategy.subtract))
+         crossover_order = 4))
     ]
 ```
-The `crossfade_frequencies` class allows to specify the frequencies of the bands. The first frequency is the upper bound of the first band, while the last frequency is the lower bound of the last band. The number of frequencies determines the number of bands. The list beginning with the `multiband_crossfade_settings` class contains the crossfade settings for each band. The first element of the list is the crossfade settings for the first band, the second element is the crossfade settings for the second band, and so on. The length of the list must be equal to the number of bands. Each band can have its own crossfade settings, totally unrelated to the other bands.
+The list beginning with the `multiband_crossfade_settings` class contains the crossfade settings for each band. The first element of the list is the crossfade settings for the first band, the second element is the crossfade settings for the second band, and so on. The length of the list must be equal to the number of bands. Each band can have its own crossfade settings, totally unrelated to the other bands. The `crossfade_frequencies` class allows to specify the frequencies of the bands. The first frequency is the upper bound of the first band, while the last frequency is the lower bound of the last band. The number of frequencies determines the number of bands. The `crossover_order` describes the slope of the filters of the frequency bands. 2 means 12 dB/octave, 4 means 24 dB/octave and 8 means 48 dB/octave.
 
 ### Advanced PLC (not updated yet)
 
