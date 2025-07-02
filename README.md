@@ -160,6 +160,19 @@ Put the audio files to be analyzed in this folder and list them as follows (path
 ```
 Afterwards you can set up the testbench settings by commenting in/out and/or changing the setup to your specific needs.
 The format is adapted in `plctestbench.ipynb` so that simple commenting out and commenting in is possible. Here, however, it is shortened for reasons of clarity.
+The basic setup looks like the following.
+```python/jupyter notebook
+    testbench_settings{your specifications}
+
+    original_audio_tracks = [your specifications]
+    packet_loss_simulators = [your specifications]
+    plc_algorithms = [your specifications]
+    metrics = [your specifications]
+
+    testbench = PLCTestbench(original_audio_tracks, packet_loss_simulators, plc_algorithms, metrics, testbench_settings)
+    testbench.run()
+    testbench.plot()
+```
 To start the testbench you need to click on the Icon with two arrows pointing to the right.
 You will find both the audio files and the results in the folder specified in `input_files`.
 
@@ -217,41 +230,32 @@ This is an example configuration for a quadratic crossfade of three bands withou
     ]
 
     plc_algorithms = [(LastPacketPLC, LastPacketPLCSettings(
-         crossfade = multiband_crossfade_settings,
-         fade_in = None,
-         crossfade_frequencies = [200, 2000],
-         crossover_order = 4))
+        crossfade = multiband_crossfade_settings,
+        fade_in = None,
+        crossfade_frequencies = [200, 2000],
+        crossover_order = 4))
     ]
 ```
 The list beginning with the `multiband_crossfade_settings` class contains the crossfade settings for each band. The first element of the list is the crossfade settings for the first band, the second element is the crossfade settings for the second band, and so on. The length of the list must be equal to the number of bands. Each band can have its own crossfade settings, totally unrelated to the other bands. The `crossfade_frequencies` class allows to specify the frequencies of the bands. The first frequency is the upper bound of the first band, while the last frequency is the lower bound of the last band. The number of frequencies determines the number of bands. The `crossover_order` describes the slope of the filters of the frequency bands. 2 means 12 dB/octave, 4 means 24 dB/octave and 8 means 48 dB/octave.
 
-### Advanced PLC (not updated yet)
+### Advanced PLC
 
-The `AdvancedPLC` object allow for two complex beheviours simultaneously:
+The `AdvancedPLC` object allows for two complex beheviours simultaneously:
 - **Multiband PLC**: different PLC algorithms can be applied to different frequency bands. 
-- **Spatial PLC**: different PLC algorithms can be applied to different audio channels (featuring M/S processing).
+- **Spatial PLC**: different PLC algorithms can be applied to different audio channels (L/R: left/right or M/S: mid/side).
 
-An example configuration of the settings to achieve such beheaviours is the following:
-```python
-    frequencies = {'mid': [200, 2000], 'side': [1000]}
-    band_settings = {\
-        'mid':
-            [(ZerosPLC, ZerosPLCSettings()),
-             (BurgPLC, BurgPLCSettings(order=512)),
-             (BurgPLC, BurgPLCSettings(order=256))],
-        'side':
-            [(LastPacketPLC, LastPacketPLCSettings()),
-             (BurgPLC, BurgPLCSettings(order=256))]}
-
-    (AdvancedPLC, AdvancedPLCSettings(band_settings, frequencies = frequencies, channel_link=False, stereo_image_processing = StereoImageType.MID_SIDE))
+An example configuration for Multiband PLC is the following.
+```python/jupyter notebook
+    plc_algorithms = [(AdvancedPLC, AdvancedPLCSettings(
+        settings = {'linked':[ZerosPLCSettings(),
+                            LastPacketPLCSettings(),
+                            BurgPLCSettings()]},
+        frequencies = {'linked': [200, 2000]},
+        channel_link=True))
+    ]
 ```
-The `frequencies` parameter is a dictionary that maps the name of the channel to a list of frequencies.
-
-The `band_settings` parameter is a dictionary that maps the name of the channel to a list of tuples. Each tuple contains the PLC algorithm to apply to the band and its settings. The length of each list must be equal to the number of bands of that channel.
-
-If L/R or M/S channels require different PLC algorithms, the `channel_link` parameter needs to be set to `False` and the related settings need to be specified in the `band_settings` parameter using the `left` and `right` or `mid` and `side` keys.
-
-Alternatively, if the same PLC algorithms need to be applied to both channels (regardless of the L/R or M/S coding), the `channel_link` parameter needs to be set to `True` and the related settings need to be specified in the `band_settings` parameter using the `linked` key.
+The `frequencies` parameter is a dictionary that maps the name of the channel to a list of frequencies. The `settings` parameter is a dictionary that maps the name of the channel to a list of tuples. Each tuple contains the PLC algorithm to apply to the band and its settings. The length of each list must be equal to the number of bands of that channel.
+If L/R or M/S channels require different PLC algorithms, the `channel_link` parameter needs to be set to `False` and the related settings need to be specified in the `settings` parameter using the `left` and `right` or `mid` and `side` keys. For example configurations take a look into `plctestbench.ipynb`.
 
 ## References
     
