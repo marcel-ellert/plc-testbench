@@ -4,7 +4,7 @@ PLCTestbench is a companion tool for researchers and developers working on Packe
 
 It features the implementation of some of the most common packet loss models, PLC algorithms and metrics.
 
-Important Information: Currently The setup.py is not working. Furthermore, the metrics **Windowed PEAQ** and **Spectral Energy Difference**, as well as the plot method `plot_peaq_summary` do not work. In addition, incorrect results were obtained for the **PEAQ** metric in the advanced mode during tests.
+Important Information: Currently the `setup.py` is not working. Furthermore, the metrics **Windowed PEAQ** and **Spectral Energy Difference**, as well as the plot method `plot_peaq_summary` do not work. In addition, incorrect results were obtained for the **PEAQ** metric in the advanced mode during tests.
 
 **Packet Loss Simulation**
 - **Binomial**: uniform distribution of packet losses, governed by the Packet Error Ratio (PER) parameter.
