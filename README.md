@@ -1,6 +1,6 @@
 # PLCTestbench
 
-PLCTestbench is a companion tool for researchers and developers working on Packet Loss Concealment (PLC). It greatly simplifies the process of measuring the reconstruction quality of PLC algorithms and allows to easily test the effects of different packet loss models and distributions. It features the implementation of some of the most common packet loss models, PLC algorithms and metrics.
+PLCTestbench is a companion tool for researchers and developers working on Packet Loss Concealment (PLC). It greatly simplifies the process of measuring the reconstruction quality of PLC algorithms and allows to easily test the effects of different packet loss models and distributions. jup  It features the implementation of some of the most common packet loss models, PLC algorithms and metrics.
 
 Important Information: There are still a few things that need to be verified. These are:
 1. the `setup.py`

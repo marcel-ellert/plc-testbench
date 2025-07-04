@@ -3,6 +3,7 @@ from .utils import relative_to_root
 
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator as RGI
+import essentia.standard as essentia
 from essentia.standard import NSGConstantQ # type: ignore # 
 import librosa
 from matplotlib import pyplot as plt
@@ -342,5 +343,4 @@ class PerceptualMetric(object):
             spectrogram_reconstructed_masked_residual = np.where(spectrogram_reconstructed_masked_residual < 0, 0, spectrogram_reconstructed_masked_residual)
             perc_metric = np.sum(spectrogram_reconstructed_masked_residual) / 10000
 
-        print(f"Perceptual Metric: {perc_metric:}")
         return perc_metric
