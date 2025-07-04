@@ -57,7 +57,7 @@ def S1dataset_generateTFmaskfunc(center_f, f_axis, ERBspac=1, timespac=0.001, va
     dTi = np.arange(np.min(dT), np.max(dT) + timespac, timespac)
     
     freqs = f_axis[(f_axis >= np.min(dFi)) & (f_axis <= np.max(dFi))]
-    freqs = freqs[(freqs >= 20) & (freqs <= 20000)]
+    freqs = freqs[(freqs >= 1) & (freqs <= 30000)]
 
     r = RGI((dT, dF_hz), AM.T, method='linear', bounds_error=False, fill_value=0)
     dTi_grid, dFi_grid = np.meshgrid(dTi, freqs, indexing='ij')
@@ -309,7 +309,7 @@ class PerceptualMetric(object):
             spectrogram_difference_db = librosa.amplitude_to_db(spectrogram_difference_mag, ref=ref_value)
 
             freq_axis = librosa.cqt_frequencies(spectrogram_original_db.shape[0], fmin=self.min_frequency, bins_per_octave=self.bins_per_octave)
-            freq_axis = freq_axis[freq_axis <= self.max_frequency]
+            freq_axis = freq_axis[freq_axis <= 2*self.max_frequency]
 
             if self.masking:
 
