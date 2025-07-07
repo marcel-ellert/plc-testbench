@@ -852,7 +852,7 @@ class PerceptualCalculatorSettings(Settings):
                        linear_mag: bool = False,
                        transform_type: str = 'cqt',
                        min_frequency: float = 32.7,
-                       max_frequency: float = 20000,
+                       max_frequency_perc: float = 20000,
                        bins_per_octave: int = 12,
                        n_bins: int = 100,
                        minimum_window: int = 128,
@@ -865,7 +865,7 @@ class PerceptualCalculatorSettings(Settings):
         self.settings["linear_mag"] = linear_mag
         self.settings["transform_type"] = transform_type
         self.settings["min_frequency"] = min_frequency
-        self.settings["max_frequency"] = max_frequency
+        self.settings["max_frequency_perc"] = max_frequency_perc
         self.settings["bins_per_octave"] = bins_per_octave
         self.settings["n_bins"] = n_bins
         self.settings["minimum_window"] = minimum_window
