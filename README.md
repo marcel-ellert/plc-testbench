@@ -2,13 +2,6 @@
 
 PLCTestbench is a companion tool for researchers and developers working on Packet Loss Concealment (PLC). It greatly simplifies the process of measuring the reconstruction quality of PLC algorithms and allows to easily test the effects of different packet loss models and distributions. jup  It features the implementation of some of the most common packet loss models, PLC algorithms and metrics.
 
-Important Information: There are still a few things that need to be verified. These are:
-1. the `setup.py`
-2. the metric **Windowed PEAQ**
-3. the metric **Spectral Energy Difference**
-4. the plot method `plot_peaq_summary`
-5. the **PEAQ** metric in advanced mode
-
 **Packet Loss Simulation**
 - **Binomial**: uniform distribution of packet losses, governed by the Packet Error Ratio (PER) parameter.
 - **Metronome**: periodic packet losses governed by the burst period, the burst length, and an offset.
@@ -21,19 +14,20 @@ Important Information: There are still a few things that need to be verified. Th
 - **Burg**: Python bindings for the [C++ implementation of the Burg method](https://github.com/matteosacchetto/burg-implementation-experiments).
 - **Deep Learning**: implementation of the algorithm proposed in [[3](#3)].
 - **Advanced**: allows to apply different PLC algorithms to different frequency bands and audio channels (M/S processing included).
-- **External**: Python bindings for C++ to simplify the integration of existing algorithms.
+- **External**: python bindings for C++ to simplify the integration of existing algorithms.
 
 **Metrics**
 - **Mean Square Error**: the mean square error between the original and reconstructed signal.
 - **Mean Amplitude Error**: the mean amplitude error between the original and reconstructed signal.
-- **PEAQ**: the Perceptual Evaluation of Audio Quality (PEAQ) metric, as defined in [[4](#4)].
-- **Windowed PEAQ**: PEAQ with a specific window length. (Currenty not usable)
-- **Spectral Energy Difference**: Difference magnitude of DFT energies between the original and reconstructed signal. (Currenty not usable) 
+- **PEAQ**: the Perceptual evaluation of audio quality (PEAQ) metric, as defined in [[4](#4)] (**use basic mode, advanced mode needs to be verified**)
+- **Windowed PEAQ**: PEAQ with a specific window length (**currenty not usable, implemantation incomplete**).
+- **Spectral Energy Difference**: difference magnitude of DFT energies between the original and reconstructed signal (**currenty not usable, implemantation incomplete**).
 - **Human**: this metric produces the config file for a MUSHRA test using as stimuli excerpts of the reconstructed audio tracks. It also gathers the results of the test to be displayed alongside the other metrics.
-- **Perceptual**: perceptually-motivated evaluation metric for Packet Loss Concealment in Networked Music Performances, as defined in [[5](#5)]
+- **Perceptual**: perceptually-motivated evaluation metric for Packet loss concealment in Networked music performances, as defined in [[5](#5)]
 
 ## Installation
 
+There is a ‘setup.py’. However, the functionnality still needs to be verified. It is recommended to perform the following steps.
 You will need a mongoDB database to store the results. You can install it locally or use a cloud service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 It is recomended however to use the [Docker image](https://hub.docker.com/_/mongo) provided by MongoDB.
 
