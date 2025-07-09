@@ -287,7 +287,7 @@ class PerceptualCalculator(OutputAnalyser):
         self.linear_mag = self.settings.get("linear_mag") 
         self.transform_type = self.settings.get("transform_type") 
         self.min_frequency = self.settings.get("min_frequency")
-        self.max_frequency_perc = self.settings.get("max_frequency_perc")
+        self.max_frequency_perceptual = self.settings.get("max_frequency_perceptual")
         self.bins_per_octave = self.settings.get("bins_per_octave")
         self.n_bins = self.settings.get("n_bins")
         self.minimum_window = self.settings.get("minimum_window")
@@ -308,7 +308,7 @@ class PerceptualCalculator(OutputAnalyser):
 
         pm = PerceptualMetric(self.transform_type,
                               self.min_frequency,
-                              self.max_frequency_perc,
+                              self.max_frequency_perceptual,
                               self.bins_per_octave,
                               self.n_bins,
                               self.minimum_window,

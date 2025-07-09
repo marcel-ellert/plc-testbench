@@ -244,7 +244,7 @@ class PerceptualMetric(object):
 
     def __init__(self, transform_type: str,
                        min_frequency: float,
-                       max_frequency_perc: float,
+                       max_frequency_perceptual: float,
                        bins_per_octave: int,
                        n_bins: int,
                        minimum_window: int,
@@ -257,7 +257,7 @@ class PerceptualMetric(object):
                        db_weighting: str,
                        metric: str) -> None:
         self.min_frequency = min_frequency
-        self.max_frequency_perc = max_frequency_perc
+        self.max_frequency_perceptual = max_frequency_perceptual
         self.bins_per_octave = bins_per_octave
         self.n_bins = n_bins
         self.minimum_window = minimum_window
@@ -270,7 +270,7 @@ class PerceptualMetric(object):
 
         if transform_type == 'cqt':
             cqt = essentia.NSGConstantQ(minFrequency=min_frequency,
-                               maxFrequency=max_frequency_perc,
+                               maxFrequency=max_frequency_perceptual,
                                binsPerOctave=bins_per_octave,
                                minimumWindow=minimum_window,
                                inputSize=input_size)
@@ -278,8 +278,8 @@ class PerceptualMetric(object):
             self.frequency_axis = librosa.cqt_frequencies(input_size, fmin=min_frequency, bins_per_octave=bins_per_octave)
         elif transform_type == 'dcgc':
             dcgc = DCGC()
-            self.transform = lambda original, reconstructed: dcgc(Sound(original, samplerate=self.fs*Hz), Sound(reconstructed, samplerate=self.fs*Hz), nbr_cf=self.n_bins, min_freq=self.min_frequency*Hz, max_freq=self.max_frequency_perc*Hz)
-            self.frequency_axis = erbspace(self.min_frequency*Hz, self.max_frequency_perc*Hz, self.bins_per_octave)
+            self.transform = lambda original, reconstructed: dcgc(Sound(original, samplerate=self.fs*Hz), Sound(reconstructed, samplerate=self.fs*Hz), nbr_cf=self.n_bins, min_freq=self.min_frequency*Hz, max_freq=self.max_frequency_perceptual*Hz)
+            self.frequency_axis = erbspace(self.min_frequency*Hz, self.max_frequency_perceptual*Hz, self.bins_per_octave)
 
         self.intorno_length = intorno_length
         self.linear_mag = linear_mag
@@ -310,7 +310,7 @@ class PerceptualMetric(object):
             spectrogram_difference_db = librosa.amplitude_to_db(spectrogram_difference_mag, ref=ref_value)
 
             freq_axis = librosa.cqt_frequencies(spectrogram_original_db.shape[0], fmin=self.min_frequency, bins_per_octave=self.bins_per_octave)
-            freq_axis = freq_axis[freq_axis <= 2*self.max_frequency_perc]
+            freq_axis = freq_axis[freq_axis <= 2*self.max_frequency_perceptual]
 
             if self.masking:
 
