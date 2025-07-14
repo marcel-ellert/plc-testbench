@@ -37,10 +37,13 @@ class PLCAlgorithm(Worker):
 
     def run(self, original_track: np.ndarray, lost_samples_idx: np.ndarray):
         '''
-        
+        This method processes an audio track and performs Packet Loss Concealment.
+        It splits the signal into packets, checks for each packet whether it was lost (based on lost_samples_idx),
+        and reconstructs the packet if necessary using the PLC logic. Finally, the reconstructed signal is returned.
         '''
         def zero_pad(original_track: np.ndarray):
             '''
+            Pads the signal with zeros so that its length is a multiple of the packet size.
             '''
             rounding_difference = self.packet_size - track_length % self.packet_size
             npad = ((0, rounding_difference),(0, 0))
