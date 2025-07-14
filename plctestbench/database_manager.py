@@ -214,6 +214,7 @@ class MongoDatabaseManager(DatabaseManager):
         for collection in self.get_database().list_collection_names():
             if self.get_database()[collection].find_one({}, {"child_collection": 1}) is not None:
                 self.initialized |= True
+
 class TinyDBDatabaseManager(DatabaseManager):
 
     def _init_client(self, *args) -> None:
