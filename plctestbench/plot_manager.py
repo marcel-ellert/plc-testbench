@@ -74,11 +74,11 @@ class PlotManager(object):
         original_track_length = (len(original_track.get_data()) - 1)/samplerate
         lost_packet_times = lost_packets_idx / (samplerate/packet_size)
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        fig.suptitle("Lost Samples")
+        fig.suptitle("Lost Packets")
         ax = fig.add_axes([0, 0, 1, 1])
         ax.vlines(lost_packet_times, 0, 1, linewidth=self.linewidth)
         ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Lost Samples")
+        ax.set_ylabel("Lost Packets")
         ax.set_xlim(0, original_track_length)
         if to_file:
             fig.savefig(node.get_path(), bbox_inches='tight')
