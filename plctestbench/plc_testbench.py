@@ -1,8 +1,5 @@
-from anytree import LevelOrderIter
-
 from .data_manager import DataManager
 from .plot_manager import PlotManager
-
 
 class PLCTestbench(object):
     '''
