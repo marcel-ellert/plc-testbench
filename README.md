@@ -27,7 +27,7 @@ PLCTestbench is a companion tool for researchers and developers working on Packe
 
 ## Installation
 
-There is a `setup.py`. However, the functionnality still needs to be verified. It is recommended to perform the following steps.
+There is a `setup.py`. However, the functionality still needs to be verified. It is recommended to perform the following steps.
 You will need a mongoDB database to store the results. You can install it locally or use a cloud service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 It is recomended however to use the [Docker image](https://hub.docker.com/_/mongo) provided by MongoDB.
 
