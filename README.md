@@ -238,7 +238,7 @@ The list beginning with the `multiband_crossfade_settings` class contains the cr
 
 ### Advanced PLC
 
-The `AdvancedPLC` object allows for two complex beheviours simultaneously:
+The `AdvancedPLC` object allows for two complex behaviours simultaneously:
 - **Multiband PLC**: different PLC algorithms can be applied to different frequency bands. 
 - **Spatial PLC**: different PLC algorithms can be applied to different audio channels (L/R: left/right or M/S: mid/side).
 
