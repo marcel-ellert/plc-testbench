@@ -75,7 +75,7 @@ class ListeningTest(object):
       # Add silence to the beginning and end of the stimulus
       stimulus = leading_silence(stimulus, fs, 200)
       stimulus = trailing_silence(stimulus, fs, 300)
-      destination.append(AudioFile.from_audio_file(reference_file, new_data=stimulus, new_path=test_folder.joinpath(f"{idx}-{index}.wav")))
+      destination.append(AudioFile.from_audio_file(reference_file, new_data=stimulus, new_path=str(test_folder.joinpath(f"{idx}-{index}.wav"))))
 
   def set_references(self, reference_data, reference_file) -> None:
     self._set_stimuli(reference_data, reference_file)
@@ -224,7 +224,7 @@ class ListeningTest(object):
     # Generate the pages for the test
     reference = self.audio_folder.joinpath(self.settings.get("reference"))
     anchor = self.audio_folder.joinpath(self.settings.get("anchor"))
-    randomized_pages = ["random"]
+    randomized_pages = []
     page_content = "<p>IMPORTANT: When you press play on a stimulus, let it play till the end or hit pause. If you press play on another stimulus before the first finished, a glitch will be produced and the test will be invalid.</p>Please rate the audibility of the glitch in the following audio examples. How much can you hear it?"
     s = self.settings.get("stimuli_per_page")
     page_data = [(self.indexes[i:i+s], self.stimuli[i:i+s]) for i in range(0, len(self.references), s)]
@@ -245,6 +245,7 @@ class ListeningTest(object):
         "stimuli": {str(Path(stimulus.get_path()).stem): str(Path(stimulus.get_path()).relative_to(self.webmushra_folder)) for stimulus in stimuli}
       }
       page["stimuli"][str(anchor.stem)] = str(anchor.relative_to(self.webmushra_folder))
+      print(f"page: {page}")
       randomized_pages.append(page)
 
     pause = {
