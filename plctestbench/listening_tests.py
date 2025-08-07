@@ -245,7 +245,6 @@ class ListeningTest(object):
         "stimuli": {str(Path(stimulus.get_path()).stem): str(Path(stimulus.get_path()).relative_to(self.webmushra_folder)) for stimulus in stimuli}
       }
       page["stimuli"][str(anchor.stem)] = str(anchor.relative_to(self.webmushra_folder))
-      print(f"page: {page}")
       randomized_pages.append(page)
 
     pause = {
