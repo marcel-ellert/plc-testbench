@@ -7,13 +7,13 @@ class PLCTestbench(object):
     initialising the testing components and running the testbench.
     '''
 
-    def __init__(self, original_audio_tracks: list = None,
-                 packet_loss_simulators: list = None,
-                 plc_algorithms: list = None,
-                 output_analysers: list = None,
-                 testbench_settings: dict = None,
-                 user: dict = None,
-                 run_id: int = None):
+    def __init__(self, original_audio_tracks: list | None = None,
+                 packet_loss_simulators: list | None = None,
+                 plc_algorithms: list | None = None,
+                 output_analysers: list | None = None,
+                 testbench_settings: dict | None = None,
+                 user: dict | None = None,
+                 run_id: int | None = None):
         '''
         Initialise the parameters and testing components.
 
