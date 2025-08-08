@@ -10,7 +10,12 @@ class LowCostConcealment:
     for audio over ip applications" by Marco Fink and Udo Zölzer
     '''
 
-    def __init__(self, max_frequency: float, f_min: float, beta: float, n_m: int, fade_in_length: int, fade_out_length: int, extraction_length: int) -> None:
+    def __init__(self, max_frequency: float, 
+                 f_min: float,
+                 beta: float, n_m: int,
+                 fade_in_length: int,
+                 fade_out_length: int,
+                 extraction_length: int) -> None:
         self._max_frequency = max_frequency
         self._f_min = f_min
         self._beta = beta
@@ -36,6 +41,7 @@ class LowCostConcealment:
     def process(self, buffer: np.ndarray, is_valid: bool):
         if not is_valid:
             pre_processed_win = self.pre_process(self._window)
+            pre_processed_win = np.asarray(pre_processed_win)
             self._extrapolated_concealment_data = np.zeros((self._extraction_length * self._packet_size, self._n_channels))
             for n in range(self._n_channels):
                 zero_crossings = self.zero_crossing_detect(pre_processed_win[:, n])
@@ -59,7 +65,7 @@ class LowCostConcealment:
         self._window[-buffer_size:] = buffer_out
         return buffer_out
 
-    def pre_process(self, buffer: np.ndarray) -> np.ndarray:
+    def pre_process(self, buffer: np.ndarray | tuple[np.ndarray, np.ndarray]) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
         buffer = np.multiply(np.sqrt(np.abs(buffer)), np.sign(buffer))
         buffer = signal.filtfilt(self._lp_filter, [1], buffer, axis=0, padlen=self._packet_size - 1)
         buffer = signal.lfilter(self._hp_filter_b, self._hp_filter_a, buffer, axis=0)
@@ -126,6 +132,7 @@ def test_pre_process(lcc: LowCostConcealment, file: sf.SoundFile):
 def test_zero_crossing_detection(lcc: LowCostConcealment, file: sf.SoundFile, debug_print: bool = False, plot: bool = False):
     audio_track = file.read()
     filtered_audio_track = lcc.pre_process(audio_track)
+    filtered_audio_track = np.asarray(filtered_audio_track)
     zero_crossings = lcc.zero_crossing_detect(filtered_audio_track[:, 0])
     if debug_print:
         for i in range(1, len(zero_crossings)):
@@ -140,7 +147,7 @@ def test_zero_crossing_detection(lcc: LowCostConcealment, file: sf.SoundFile, de
         fig = plt.figure(figsize=(12, 6), dpi=600)
         name = "Zero Crossing Detection Test"
         fig.suptitle(name)
-        ax = fig.add_axes([0, 0, 1, 1])
+        ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
         ax.set_xlabel("Time [samples]")
         ax.set_ylabel("Amplitude")
         ax.set_xticks(np.arange(0, len(sampled_audio), 5))
@@ -155,13 +162,14 @@ def test_extraction(lcc: LowCostConcealment, file: sf.SoundFile):
     audio_track = file.read()[-2000:]
     sampled_audio = audio_track[-n_samples:]
     filtered_audio_track = lcc.pre_process(sampled_audio)
+    filtered_audio_track = np.asarray(filtered_audio_track)
     zero_crossings = lcc.zero_crossing_detect(filtered_audio_track[:, 0])
     extracted_periods = lcc.extract(sampled_audio[:, 0], zero_crossings)
     extracted_periods = np.roll(extracted_periods, round(len(extracted_periods)/2))
     fig = plt.figure(figsize=(12, 6), dpi=600)
     name = "Extracted periods"
     fig.suptitle(name)
-    ax = fig.add_axes([0, 0, 1, 1])
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     ax.set_xlabel("Time [samples]")
     ax.set_ylabel("Amplitude")
     ax.grid(visible=True)
@@ -173,6 +181,7 @@ def test_alignment(lcc: LowCostConcealment, file: sf.SoundFile):
     audio_track = file.read()[-2000:]
     sampled_audio = audio_track[-n_samples:]
     filtered_audio_track = lcc.pre_process(sampled_audio)
+    filtered_audio_track = np.asarray(filtered_audio_track)
     zero_crossings = lcc.zero_crossing_detect(filtered_audio_track[:, 0])
     extracted_periods = lcc.extract(sampled_audio[:, 0], zero_crossings)
     rolled = lcc.align(audio_track[:, 0], extracted_periods)
@@ -180,7 +189,7 @@ def test_alignment(lcc: LowCostConcealment, file: sf.SoundFile):
     fig = plt.figure(figsize=(12, 6), dpi=600)
     name = "Aligned concealment"
     fig.suptitle(name)
-    ax = fig.add_axes([0, 0, 1, 1])
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     ax.set_xlabel("Time [samples]")
     ax.set_ylabel("Amplitude")
     ax.grid(visible=True)
@@ -193,6 +202,7 @@ def test_extrapolation_and_fade_in(lcc: LowCostConcealment, file: sf.SoundFile):
     audio_track = file.read()[-2000:]
     sampled_audio = audio_track[-n_samples:]
     filtered_audio_track = lcc.pre_process(sampled_audio)
+    filtered_audio_track = np.asarray(filtered_audio_track)
     zero_crossings = lcc.zero_crossing_detect(filtered_audio_track[:, 0])
     extracted_periods = lcc.extract(sampled_audio[:, 0], zero_crossings)
     rolled = lcc.align(audio_track[:, 0], extracted_periods)
@@ -201,7 +211,7 @@ def test_extrapolation_and_fade_in(lcc: LowCostConcealment, file: sf.SoundFile):
     fig = plt.figure(figsize=(12, 6), dpi=600)
     name = "Extrapolation and Fade In"
     fig.suptitle(name)
-    ax = fig.add_axes([0, 0, 1, 1])
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     ax.set_xlabel("Time [samples]")
     ax.set_ylabel("Amplitude")
     ax.grid(visible=True)
@@ -215,6 +225,7 @@ def test_fade_out(lcc: LowCostConcealment, file: sf.SoundFile):
     sampled_audio = audio_track[:lcc._win_size]
     next_block = audio_track[lcc._win_size + packet_size:]
     filtered_audio_track = lcc.pre_process(sampled_audio)
+    filtered_audio_track = np.asarray(filtered_audio_track)
     zero_crossings = lcc.zero_crossing_detect(filtered_audio_track[:, 0])
     extracted_periods = lcc.extract(sampled_audio[:, 0], zero_crossings)
     aligned = lcc.align(sampled_audio[:, 0], extracted_periods)
@@ -225,7 +236,7 @@ def test_fade_out(lcc: LowCostConcealment, file: sf.SoundFile):
     fig = plt.figure(figsize=(12, 6), dpi=600)
     name = "Fade Out"
     fig.suptitle(name)
-    ax = fig.add_axes([0, 0, 1, 1])
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     ax.set_xlabel("Time [samples]")
     ax.set_ylabel("Amplitude")
     ax.grid(visible=True)
