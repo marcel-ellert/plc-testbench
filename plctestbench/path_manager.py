@@ -9,8 +9,7 @@ folder_suffixes = ['lost_samples_masks',
 
 def compute_absolute_folder_path(parent: Node) -> str:
     '''
-    This private function computes the absolute path of the given
-    node climbing down the ancestors list.
+    This private function computes the absolute path of the given node climbing down the ancestors list.
 
         Inputs:
             node:   the node instance to compute the absolute path for
@@ -30,8 +29,7 @@ class PathManager(object):
         to deal with filepaths.
 
             Inputs:
-                root_folder:    The root folder where all the files will
-                                be created
+                root_folder:    The root folder where all the files will be created
         '''
         self.root_folder = root_folder
         if not path.exists(root_folder):
@@ -58,7 +56,7 @@ class PathManager(object):
             os.mkdir(folder_name)
         return folder_name, absolute_path
 
-    def get_node_paths(self, worker, settings, parent: Node) -> tuple:
+    def get_node_paths(self, worker, settings, parent: Node | None) -> tuple:
         '''
         This function computes the relative path of the node, creates its
         directory and stores it in the node.
